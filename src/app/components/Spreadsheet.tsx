@@ -1,4 +1,4 @@
-import { Box, Stack, SxProps, Typography, useTheme } from '@mui/material';
+import { Box, Stack, useTheme } from '@mui/material';
 import _ from 'lodash';
 import { create } from 'mutative';
 import { useState } from 'react';
@@ -23,7 +23,7 @@ function columnLabel(columnIdx: number) {
 export default function Spreadsheet() {
   const theme = useTheme();
 
-  const [spreadsheetState, setSpreadsheetState] = useState(
+  const [spreadsheetState, setSpreadsheetState] = useState<any[][]>(
     _.times(NUM_ROWS, () => _.times(NUM_COLUMNS, _.constant(''))),
   );
 
