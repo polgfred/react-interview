@@ -1,22 +1,31 @@
-import { Box, Flex } from '@chakra-ui/react';
-import _ from 'lodash';
-import React, { useState } from 'react';
+'use client';
 
-import Cell from 'components/Cell';
+import { Box, Stack, useTheme } from '@mui/material';
+import _ from 'lodash';
+import { useState } from 'react';
+
+import Cell from './Cell';
 
 const NUM_ROWS = 10;
 const NUM_COLUMNS = 10;
 
-const Spreadsheet: React.FC = () => {
+export default function Spreadsheet() {
+  const theme = useTheme();
+
   const [spreadsheetState, setSpreadsheetState] = useState(
     _.times(NUM_ROWS, () => _.times(NUM_COLUMNS, _.constant(''))),
   );
 
   return (
-    <Box width="full">
+    <Box
+      sx={{
+        borderTop: `1px solid ${theme.palette.divider}`,
+        borderLeft: `1px solid ${theme.palette.divider}`,
+      }}
+    >
       {spreadsheetState.map((row, rowIdx) => {
         return (
-          <Flex key={String(rowIdx)}>
+          <Stack key={String(rowIdx)} direction="row">
             {row.map((cellValue, columnIdx) => (
               <Cell
                 key={`${rowIdx}/${columnIdx}`}
@@ -35,11 +44,9 @@ const Spreadsheet: React.FC = () => {
                 }}
               />
             ))}
-          </Flex>
+          </Stack>
         );
       })}
     </Box>
   );
-};
-
-export default Spreadsheet;
+}

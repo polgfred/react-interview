@@ -1,13 +1,15 @@
-import { Input, Box } from '@chakra-ui/react';
-import React, { useCallback } from 'react';
+import { Input, Box, useTheme } from '@mui/material';
+import { type ChangeEventHandler, useCallback } from 'react';
 
 interface Props {
   value: string;
   onChange: (newValue: string) => void;
 }
 
-const Cell: React.FC<Props> = ({ value, onChange }) => {
-  const onChangeHandler = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+export default function Cell({ value, onChange }: Props) {
+  const theme = useTheme();
+
+  const onChangeHandler = useCallback<ChangeEventHandler<HTMLInputElement>>(
     (ev) => {
       onChange(ev.target.value);
     },
@@ -15,10 +17,18 @@ const Cell: React.FC<Props> = ({ value, onChange }) => {
   );
 
   return (
-    <Box>
-      <Input value={value} borderRadius={0} width="full" onChange={onChangeHandler} />
+    <Box
+      sx={{
+        borderRight: `1px solid ${theme.palette.divider}`,
+      }}
+    >
+      <Input
+        value={value}
+        onChange={onChangeHandler}
+        sx={{
+          padding: 1,
+        }}
+      />
     </Box>
   );
-};
-
-export default Cell;
+}

@@ -1,15 +1,23 @@
-import { ChakraProvider, Heading } from '@chakra-ui/react';
-import React from 'react';
+import { Box, Typography } from '@mui/material';
 
-import Spreadsheet from 'components/Spreadsheet';
+import Spreadsheet from './Spreadsheet';
 
-const App: React.FC = () => {
+export default function App() {
   return (
-    <ChakraProvider resetCSS>
-      <Heading marginBottom="2rem">Spreadsheet</Heading>
+    <Box
+      sx={{
+        padding: 2,
+      }}
+    >
+      <Typography
+        variant="h2"
+        sx={{
+          marginBottom: 4,
+        }}
+      >
+        Spreadsheet
+      </Typography>
       <Spreadsheet />
-    </ChakraProvider>
+    </Box>
   );
-};
-
-export default App;
+}
