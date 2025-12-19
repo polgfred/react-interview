@@ -1,5 +1,3 @@
-'use client';
-
 import { Box, Stack, useTheme } from '@mui/material';
 import _ from 'lodash';
 import { useState } from 'react';

@@ -1,23 +1,27 @@
-import { Box, Typography } from '@mui/material';
+import { Box, CssBaseline, ThemeProvider, Typography } from '@mui/material';
 
+import theme from '../../theme';
 import Spreadsheet from './Spreadsheet';
 
 export default function App() {
   return (
-    <Box
-      sx={{
-        padding: 2,
-      }}
-    >
-      <Typography
-        variant="h2"
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box
         sx={{
-          marginBottom: 4,
+          padding: 2,
         }}
       >
-        Spreadsheet
-      </Typography>
-      <Spreadsheet />
-    </Box>
+        <Typography
+          variant="h2"
+          sx={{
+            marginBottom: 4,
+          }}
+        >
+          Spreadsheet
+        </Typography>
+        <Spreadsheet />
+      </Box>
+    </ThemeProvider>
   );
 }
