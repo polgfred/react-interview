@@ -1,5 +1,5 @@
 import { Input, Box, useTheme } from '@mui/material';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Props {
   value: any;
@@ -14,27 +14,40 @@ function convertToCurrency(value: number) {
   return currencyFormatter.format(value);
 }
 
+function getRealValue(input: string) {
+  let maybeNumber = Number(input);
+  if (input.length > 0 && Number.isFinite(maybeNumber)) {
+    return maybeNumber;
+  } else {
+    return input;
+  }
+}
+
+function getDisplayValue(input: string) {
+  const realValue = getRealValue(input);
+  if (typeof realValue === 'number') {
+    return convertToCurrency(realValue);
+  } else {
+    return input;
+  }
+}
+
 export default function Cell({ value, isSelected, onChange, onToggleCell }: Props) {
   const theme = useTheme();
 
   // this is what we show the user, regardless of the actual cell value
   const [displayValue, setDisplayValue] = useState(value);
 
+  // in case this was changed upstream by a selection move
+  useEffect(() => {
+    setDisplayValue(getDisplayValue(value));
+  }, [value]);
+
   // save the value when the user clicks out of the cell
   const handleSave = useCallback(
     (input: string) => {
-      // check whether the input is numeric
-      let maybeNumber = Number(input);
-      if (input.length > 0 && Number.isFinite(maybeNumber)) {
-        // update the display to show the formatted value
-        setDisplayValue(convertToCurrency(maybeNumber));
-        // update the cell value to the actual number
-        onChange(maybeNumber);
-      } else {
-        // otherwise, just show and save the string value
-        setDisplayValue(input);
-        onChange(input);
-      }
+      setDisplayValue(getDisplayValue(input));
+      onChange(getRealValue(input));
     },
     [value, setDisplayValue, onChange],
   );

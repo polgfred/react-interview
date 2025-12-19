@@ -1,7 +1,7 @@
 import { Box, Stack, useTheme } from '@mui/material';
 import _ from 'lodash';
 import { create } from 'mutative';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import HeaderCell from './HeaderCell';
 import Cell from './Cell';
@@ -23,17 +23,84 @@ function columnLabel(columnIdx: number) {
 export default function Spreadsheet() {
   const theme = useTheme();
 
+  // the 2-d array representing cell data
   const [spreadsheetState, setSpreadsheetState] = useState<any[][]>(
     _.times(NUM_ROWS, () => _.times(NUM_COLUMNS, _.constant(''))),
   );
 
-  const [selectedCells, setSelectedCells] = useState<[number, number][]>([]);
+  // the currently selected cell
+  const [selectedCell, setSelectedCell] = useState<[number, number] | null>(null);
+
+  // move this selection up, down, left, or right
+  const moveSelection = useCallback(
+    (key: string) => {
+      if (!selectedCell) {
+        return;
+      }
+
+      const [rowIdx, columnIdx] = selectedCell;
+
+      // this is definitely repetitive, but no time to refactor right now
+      switch (key) {
+        case 'ArrowUp':
+          if (rowIdx > 0) {
+            setSpreadsheetState(
+              create(spreadsheetState, (draft) => {
+                draft[rowIdx][columnIdx] = spreadsheetState[rowIdx - 1][columnIdx];
+                draft[rowIdx - 1][columnIdx] = spreadsheetState[rowIdx][columnIdx];
+              }),
+            );
+            setSelectedCell([rowIdx - 1, columnIdx]);
+          }
+          break;
+        case 'ArrowDown':
+          if (rowIdx < NUM_ROWS - 1) {
+            setSpreadsheetState(
+              create(spreadsheetState, (draft) => {
+                draft[rowIdx][columnIdx] = spreadsheetState[rowIdx + 1][columnIdx];
+                draft[rowIdx + 1][columnIdx] = spreadsheetState[rowIdx][columnIdx];
+              }),
+            );
+            setSelectedCell([rowIdx + 1, columnIdx]);
+          }
+          break;
+        case 'ArrowLeft':
+          if (columnIdx > 0) {
+            setSpreadsheetState((state) =>
+              create(state, (draft) => {
+                draft[rowIdx][columnIdx] = state[rowIdx][columnIdx - 1];
+                draft[rowIdx][columnIdx - 1] = state[rowIdx][columnIdx];
+              }),
+            );
+            setSelectedCell([rowIdx, columnIdx - 1]);
+          }
+          break;
+        case 'ArrowRight':
+          if (columnIdx < NUM_COLUMNS - 1) {
+            setSpreadsheetState(
+              create(spreadsheetState, (draft) => {
+                draft[rowIdx][columnIdx] = spreadsheetState[rowIdx][columnIdx + 1];
+                draft[rowIdx][columnIdx + 1] = spreadsheetState[rowIdx][columnIdx];
+              }),
+            );
+            setSelectedCell([rowIdx, columnIdx + 1]);
+          }
+          break;
+      }
+    },
+    [selectedCell, spreadsheetState, setSelectedCell, setSpreadsheetState],
+  );
 
   return (
     <Box
       sx={{
         borderTop: `1px solid ${theme.palette.divider}`,
         borderLeft: `1px solid ${theme.palette.divider}`,
+      }}
+      onKeyDown={(ev) => {
+        if (ev.altKey) {
+          moveSelection(ev.key);
+        }
       }}
     >
       <>
@@ -49,34 +116,31 @@ export default function Spreadsheet() {
           <Stack key={rowIdx} direction="row">
             <>
               <HeaderCell sx={{ flex: '0 0 60px' }}>{rowIdx}</HeaderCell>
-              {row.map((cellValue, columnIdx) => (
-                <Cell
-                  key={columnIdx}
-                  value={cellValue}
-                  isSelected={selectedCells.some(([r, c]) => r === rowIdx && c === columnIdx)}
-                  onChange={(newValue) => {
-                    setSpreadsheetState(
-                      create(spreadsheetState, (draft) => {
-                        draft[rowIdx][columnIdx] = newValue;
-                      }),
-                    );
-                  }}
-                  onToggleCell={() => {
-                    setSelectedCells(
-                      create(selectedCells, (draft) => {
-                        const idx = selectedCells.findIndex(
-                          ([r, c]) => r === rowIdx && c === columnIdx,
-                        );
-                        if (idx === -1) {
-                          draft.push([rowIdx, columnIdx]);
-                        } else {
-                          draft.splice(idx, 1);
-                        }
-                      }),
-                    );
-                  }}
-                />
-              ))}
+              {row.map((cellValue, columnIdx) => {
+                const isSelected =
+                  selectedCell && selectedCell[0] === rowIdx && selectedCell[1] === columnIdx;
+                return (
+                  <Cell
+                    key={columnIdx}
+                    value={cellValue}
+                    isSelected={isSelected}
+                    onChange={(newValue) => {
+                      setSpreadsheetState(
+                        create(spreadsheetState, (draft) => {
+                          draft[rowIdx][columnIdx] = newValue;
+                        }),
+                      );
+                    }}
+                    onToggleCell={() => {
+                      if (isSelected) {
+                        setSelectedCell(null);
+                      } else {
+                        setSelectedCell([rowIdx, columnIdx]);
+                      }
+                    }}
+                  />
+                );
+              })}
             </>
           </Stack>
         ))}
