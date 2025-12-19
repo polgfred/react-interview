@@ -27,6 +27,8 @@ export default function Spreadsheet() {
     _.times(NUM_ROWS, () => _.times(NUM_COLUMNS, _.constant(''))),
   );
 
+  const [selectedCells, setSelectedCells] = useState<[number, number][]>([]);
+
   return (
     <Box
       sx={{
@@ -51,10 +53,25 @@ export default function Spreadsheet() {
                 <Cell
                   key={columnIdx}
                   value={cellValue}
+                  isSelected={selectedCells.some(([r, c]) => r === rowIdx && c === columnIdx)}
                   onChange={(newValue) => {
                     setSpreadsheetState(
                       create(spreadsheetState, (draft) => {
                         draft[rowIdx][columnIdx] = newValue;
+                      }),
+                    );
+                  }}
+                  onToggleCell={() => {
+                    setSelectedCells(
+                      create(selectedCells, (draft) => {
+                        const idx = selectedCells.findIndex(
+                          ([r, c]) => r === rowIdx && c === columnIdx,
+                        );
+                        if (idx === -1) {
+                          draft.push([rowIdx, columnIdx]);
+                        } else {
+                          draft.splice(idx, 1);
+                        }
                       }),
                     );
                   }}

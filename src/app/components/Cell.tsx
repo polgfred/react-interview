@@ -3,7 +3,9 @@ import { useCallback, useState } from 'react';
 
 interface Props {
   value: any;
+  isSelected: boolean;
   onChange: (newValue: any) => void;
+  onToggleCell: () => void;
 }
 
 const currencyFormatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
@@ -12,7 +14,7 @@ function convertToCurrency(value: number) {
   return currencyFormatter.format(value);
 }
 
-export default function Cell({ value, onChange }: Props) {
+export default function Cell({ value, isSelected, onChange, onToggleCell }: Props) {
   const theme = useTheme();
 
   // this is what we show the user, regardless of the actual cell value
@@ -55,7 +57,13 @@ export default function Cell({ value, onChange }: Props) {
         onChange={(ev) => {
           setDisplayValue(ev.target.value);
         }}
+        onClick={(ev) => {
+          if (ev.altKey) {
+            onToggleCell();
+          }
+        }}
         sx={{
+          backgroundColor: isSelected ? '#8884' : 'inherit',
           padding: 1,
         }}
       />
