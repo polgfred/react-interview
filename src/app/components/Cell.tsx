@@ -20,6 +20,7 @@ export default function Cell({ value, onChange }: Props) {
     <Box
       sx={{
         borderRight: `1px solid ${theme.palette.divider}`,
+        flex: 1,
       }}
     >
       <Input
