@@ -1,8 +1,9 @@
 import { Box, Stack, SxProps, Typography, useTheme } from '@mui/material';
 import _ from 'lodash';
 import { create } from 'mutative';
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 
+import HeaderCell from './HeaderCell';
 import Cell from './Cell';
 
 const NUM_ROWS = 10;
@@ -17,30 +18,6 @@ function columnLabel(columnIdx: number) {
   const major = Math.floor(columnIdx / COLUMNS.length);
   const minor = columnIdx % COLUMNS.length;
   return columnLabel(major - 1) + COLUMNS[minor];
-}
-
-function Header({ sx, children }: { sx?: SxProps; children?: ReactNode }) {
-  const theme = useTheme();
-
-  return (
-    <Box
-      sx={{
-        borderRight: `1px solid ${theme.palette.divider}`,
-        borderBottom: `1px solid ${theme.palette.divider}`,
-        ...sx,
-      }}
-    >
-      <Typography
-        sx={{
-          padding: 1,
-          fontWeight: 'bold',
-          textAlign: 'center',
-        }}
-      >
-        {children}
-      </Typography>
-    </Box>
-  );
 }
 
 export default function Spreadsheet() {
@@ -59,17 +36,17 @@ export default function Spreadsheet() {
     >
       <>
         <Stack direction="row">
-          <Header sx={{ flex: '0 0 60px' }}> </Header>
+          <HeaderCell sx={{ flex: '0 0 60px' }}> </HeaderCell>
           {spreadsheetState[0].map((_, columnIdx) => (
-            <Header key={columnIdx} sx={{ flex: 1 }}>
+            <HeaderCell key={columnIdx} sx={{ flex: 1 }}>
               {columnLabel(columnIdx)}
-            </Header>
+            </HeaderCell>
           ))}
         </Stack>
         {spreadsheetState.map((row, rowIdx) => (
           <Stack key={rowIdx} direction="row">
             <>
-              <Header sx={{ flex: '0 0 60px' }}>{rowIdx}</Header>
+              <HeaderCell sx={{ flex: '0 0 60px' }}>{rowIdx}</HeaderCell>
               {row.map((cellValue, columnIdx) => (
                 <Cell
                   key={columnIdx}
