@@ -1,6 +1,7 @@
 import { Box, Stack, useTheme } from '@mui/material';
 import _ from 'lodash';
-import { useState } from 'react';
+import { create } from 'mutative';
+import { useMemo, useState } from 'react';
 
 import Cell from './Cell';
 
@@ -21,30 +22,23 @@ export default function Spreadsheet() {
         borderLeft: `1px solid ${theme.palette.divider}`,
       }}
     >
-      {spreadsheetState.map((row, rowIdx) => {
-        return (
-          <Stack key={String(rowIdx)} direction="row">
-            {row.map((cellValue, columnIdx) => (
-              <Cell
-                key={`${rowIdx}/${columnIdx}`}
-                value={cellValue}
-                onChange={(newValue: string) => {
-                  const newRow = [
-                    ...spreadsheetState[rowIdx].slice(0, columnIdx),
-                    newValue,
-                    ...spreadsheetState[rowIdx].slice(columnIdx + 1),
-                  ];
-                  setSpreadsheetState([
-                    ...spreadsheetState.slice(0, rowIdx),
-                    newRow,
-                    ...spreadsheetState.slice(rowIdx + 1),
-                  ]);
-                }}
-              />
-            ))}
-          </Stack>
-        );
-      })}
+      {spreadsheetState.map((row, rowIdx) => (
+        <Stack key={rowIdx} direction="row">
+          {row.map((cellValue, columnIdx) => (
+            <Cell
+              key={columnIdx}
+              value={cellValue}
+              onChange={(newValue) => {
+                setSpreadsheetState(
+                  create(spreadsheetState, (draft) => {
+                    draft[rowIdx][columnIdx] = newValue;
+                  }),
+                );
+              }}
+            />
+          ))}
+        </Stack>
+      ))}
     </Box>
   );
 }
