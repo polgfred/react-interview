@@ -38,11 +38,6 @@ export default function Cell({ value, isSelected, onChange, onToggleCell }: Prop
   // this is what we show the user, regardless of the actual cell value
   const [displayValue, setDisplayValue] = useState(value);
 
-  // in case this was changed upstream by a selection move
-  useEffect(() => {
-    setDisplayValue(getDisplayValue(value));
-  }, [value]);
-
   // save the value when the user clicks out of the cell
   const handleSave = useCallback(
     (input: string) => {

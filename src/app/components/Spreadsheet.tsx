@@ -40,55 +40,30 @@ export default function Spreadsheet() {
 
       const [rowIdx, columnIdx] = selectedCell;
 
-      // this is definitely repetitive, but no time to refactor right now
       switch (key) {
         case 'ArrowUp':
           if (rowIdx > 0) {
-            setSpreadsheetState(
-              create(spreadsheetState, (draft) => {
-                draft[rowIdx][columnIdx] = spreadsheetState[rowIdx - 1][columnIdx];
-                draft[rowIdx - 1][columnIdx] = spreadsheetState[rowIdx][columnIdx];
-              }),
-            );
             setSelectedCell([rowIdx - 1, columnIdx]);
           }
           break;
         case 'ArrowDown':
           if (rowIdx < NUM_ROWS - 1) {
-            setSpreadsheetState(
-              create(spreadsheetState, (draft) => {
-                draft[rowIdx][columnIdx] = spreadsheetState[rowIdx + 1][columnIdx];
-                draft[rowIdx + 1][columnIdx] = spreadsheetState[rowIdx][columnIdx];
-              }),
-            );
             setSelectedCell([rowIdx + 1, columnIdx]);
           }
           break;
         case 'ArrowLeft':
           if (columnIdx > 0) {
-            setSpreadsheetState((state) =>
-              create(state, (draft) => {
-                draft[rowIdx][columnIdx] = state[rowIdx][columnIdx - 1];
-                draft[rowIdx][columnIdx - 1] = state[rowIdx][columnIdx];
-              }),
-            );
             setSelectedCell([rowIdx, columnIdx - 1]);
           }
           break;
         case 'ArrowRight':
           if (columnIdx < NUM_COLUMNS - 1) {
-            setSpreadsheetState(
-              create(spreadsheetState, (draft) => {
-                draft[rowIdx][columnIdx] = spreadsheetState[rowIdx][columnIdx + 1];
-                draft[rowIdx][columnIdx + 1] = spreadsheetState[rowIdx][columnIdx];
-              }),
-            );
             setSelectedCell([rowIdx, columnIdx + 1]);
           }
           break;
       }
     },
-    [selectedCell, spreadsheetState, setSelectedCell, setSpreadsheetState],
+    [selectedCell, setSelectedCell],
   );
 
   return (
@@ -98,9 +73,7 @@ export default function Spreadsheet() {
         borderLeft: `1px solid ${theme.palette.divider}`,
       }}
       onKeyDown={(ev) => {
-        if (ev.altKey) {
-          moveSelection(ev.key);
-        }
+        moveSelection(ev.key);
       }}
     >
       <>
